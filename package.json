@@ -10,7 +10,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "seed": "tsx prisma/seed.ts",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build"
+    "vercel-build": "DATABASE_URL='file:./dev.db' prisma generate && tsx prisma/apply-migrations.ts && next build"
   },
   "dependencies": {
     "@libsql/client": "^0.8.1",
