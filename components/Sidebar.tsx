@@ -15,6 +15,7 @@ export default function Sidebar() {
   const [boards, setBoards] = useState<BoardSummary[]>([]);
   const [newBoardName, setNewBoardName] = useState("");
   const [creating, setCreating] = useState(false);
+  const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -25,6 +26,11 @@ export default function Sidebar() {
 
   useEffect(() => {
     loadBoards();
+  }, [pathname]);
+
+  // Close drawer on route change
+  useEffect(() => {
+    setOpen(false);
   }, [pathname]);
 
   async function createBoard(e: React.FormEvent) {
@@ -49,13 +55,19 @@ export default function Sidebar() {
     }
   }
 
-  return (
-    <aside className="w-64 shrink-0 border-r border-gray-200 bg-white h-screen sticky top-0 flex flex-col">
-      <div className="px-5 py-5 border-b border-gray-100">
+  const sidebarContent = (
+    <aside className="w-64 shrink-0 border-r border-gray-200 bg-white h-full flex flex-col">
+      <div className="px-5 py-5 border-b border-gray-100 flex items-center justify-between">
         <Link href="/" className="text-xl font-bold text-navy">
           SONO
         </Link>
-        <p className="text-xs text-gray-500 mt-0.5">Inspiration, captured.</p>
+        <button
+          onClick={() => setOpen(false)}
+          className="lg:hidden text-gray-400 hover:text-gray-600 p-1"
+          aria-label="Close menu"
+        >
+          ✕
+        </button>
       </div>
 
       <nav className="px-3 py-3 border-b border-gray-100">
@@ -107,5 +119,38 @@ export default function Sidebar() {
         </button>
       </form>
     </aside>
+  );
+
+  return (
+    <>
+      {/* Desktop: always-visible sidebar */}
+      <div className="hidden lg:flex h-screen sticky top-0">
+        {sidebarContent}
+      </div>
+
+      {/* Mobile: hamburger button */}
+      <button
+        onClick={() => setOpen(true)}
+        className="lg:hidden fixed top-3 left-3 z-40 bg-white border border-gray-200 rounded-md p-2 shadow-sm"
+        aria-label="Open menu"
+      >
+        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      {/* Mobile: drawer + backdrop */}
+      {open && (
+        <>
+          <div
+            className="lg:hidden fixed inset-0 z-40 bg-black/40"
+            onClick={() => setOpen(false)}
+          />
+          <div className="lg:hidden fixed inset-y-0 left-0 z-50 flex h-full">
+            {sidebarContent}
+          </div>
+        </>
+      )}
+    </>
   );
 }

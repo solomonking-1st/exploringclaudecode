@@ -67,11 +67,32 @@ async function fetchWithTimeout(url: string, timeoutMs = 8000): Promise<Response
   }
 }
 
+// TikTok mobile share links (vm.tiktok.com) are short-link redirects. The
+// oEmbed endpoint only accepts full /video/ URLs, so follow the redirect first.
+async function resolveTikTokUrl(sourceUrl: string): Promise<string> {
+  const u = new URL(sourceUrl);
+  if (u.hostname !== "vm.tiktok.com") return sourceUrl;
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(sourceUrl, {
+      method: "HEAD",
+      redirect: "follow",
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    return res.url || sourceUrl;
+  } catch {
+    return sourceUrl;
+  }
+}
+
 // TikTok's oEmbed endpoint is public and requires no auth today. It is not an
 // official, versioned API — see the tech spec's Platform Integration Notes —
 // so this is a dependency to monitor, not a stable contract.
 async function fetchTikTokEmbed(sourceUrl: string) {
-  const endpoint = `https://www.tiktok.com/oembed?url=${encodeURIComponent(sourceUrl)}`;
+  const resolvedUrl = await resolveTikTokUrl(sourceUrl);
+  const endpoint = `https://www.tiktok.com/oembed?url=${encodeURIComponent(resolvedUrl)}`;
   const res = await fetchWithTimeout(endpoint);
   if (!res || !res.ok) return null;
 

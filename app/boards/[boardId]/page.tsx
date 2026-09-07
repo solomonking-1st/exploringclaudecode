@@ -61,7 +61,7 @@ export default function BoardPage({ params }: { params: { boardId: string } }) {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8">
+    <div className="max-w-6xl mx-auto px-6 py-8 pt-14 lg:pt-8">
       <h1 className="text-2xl font-bold text-navy mb-1">{boardName || "Board"}</h1>
       <p className="text-sm text-gray-500 mb-6">Paste a link to save inspiration into this board.</p>
 
