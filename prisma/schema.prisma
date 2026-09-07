@@ -1,0 +1,60 @@
+// Sono — data model (Phase 1 + 2, no auth yet, Step 2 re-host fallback scraped for now)
+// SQLite for local dev/testing; swap the datasource to postgresql for production.
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+// Stays "sqlite" even in production: Turso/libSQL is wire-compatible with
+// SQLite, so the schema and every query are identical between local dev
+// (a plain file) and hosted deployment (Turso) — only the driver adapter
+// in lib/prisma.ts and the DATABASE_URL differ. See .env.example.
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Board {
+  id        String      @id @default(cuid())
+  name      String
+  isDefault Boolean     @default(false)
+  createdAt DateTime    @default(now())
+  items     SavedItem[]
+}
+
+model Tag {
+  id    String      @id @default(cuid())
+  name  String      @unique
+  items SavedItem[] // implicit many-to-many
+}
+
+// SQLite has no native enum type, so SourcePlatform ("TIKTOK" | "INSTAGRAM" | "FACEBOOK")
+// and FetchMethod ("EMBED" | "FAILED") are validated in application code (lib/save-pipeline.ts)
+// instead of at the schema level. Swapping to Postgres later can promote these to real enums.
+//
+// FetchMethod=FAILED just means "no in-app preview yet" (embed didn't work, no Step 2
+// re-host fallback in this build) — the item is still saved with its source link so it
+// can be tagged, noted, and organized regardless.
+
+model SavedItem {
+  id               String   @id @default(cuid())
+  board            Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  boardId          String
+  sourcePlatform   String
+  sourceUrl        String
+  fetchMethod      String
+  embedHtml        String?
+  thumbnailUrl     String?
+  title            String?
+  notes            String?
+  tested           Boolean  @default(false)
+  performanceNotes String?
+  tags             Tag[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([boardId])
+  @@index([tested])
+  @@index([sourcePlatform])
+}
