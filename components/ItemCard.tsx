@@ -2,6 +2,17 @@
 
 import { useState } from "react";
 
+// Extracts the numeric video ID from stored TikTok oEmbed HTML so we can
+// render a direct embed iframe instead of running embed.js on every card.
+// The direct iframe is cross-origin (tiktok.com ≠ our domain), so the browser
+// blocks it from navigating our top frame — the user can play/pause but
+// clicking the TikTok logo or username won't redirect the page.
+function getTikTokVideoId(embedHtml: string | null): string | null {
+  if (!embedHtml) return null;
+  const m = embedHtml.match(/data-video-id="(\d+)"/);
+  return m ? m[1] : null;
+}
+
 export interface Item {
   id: string;
   boardId: string;
@@ -59,18 +70,30 @@ export default function ItemCard({
     }
   }
 
+  const tikTokVideoId =
+    item.sourcePlatform === "TIKTOK" ? getTikTokVideoId(item.embedHtml) : null;
+
   return (
     <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col">
-      <div className="bg-gray-50 min-h-[200px] flex items-center justify-center overflow-hidden">
-        {item.thumbnailUrl ? (
+      <div className="bg-gray-50 overflow-hidden">
+        {tikTokVideoId ? (
+          <iframe
+            src={`https://www.tiktok.com/embed/v2/${tikTokVideoId}`}
+            className="w-full border-0 block"
+            style={{ height: 480 }}
+            allow="autoplay; encrypted-media"
+            scrolling="no"
+            title={item.title ?? "TikTok video"}
+          />
+        ) : item.thumbnailUrl ? (
           <img
             src={item.thumbnailUrl}
             alt={item.title ?? ""}
-            className="w-full object-cover"
+            className="w-full object-cover min-h-[200px]"
             loading="lazy"
           />
         ) : (
-          <div className="text-center text-gray-400 text-sm px-4 py-10">
+          <div className="min-h-[200px] flex items-center justify-center text-center text-gray-400 text-sm px-4 py-10">
             No preview available.
             <br />
             Use &ldquo;View on {PLATFORM_LABEL[item.sourcePlatform]}&rdquo; below to watch.
