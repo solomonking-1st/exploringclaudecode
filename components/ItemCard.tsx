@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import EmbedRenderer from "./EmbedRenderer";
 
 export interface Item {
   id: string;
@@ -62,18 +61,19 @@ export default function ItemCard({
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden flex flex-col">
-      <div className="bg-gray-50 min-h-[220px] flex items-center justify-center overflow-hidden">
-        {item.fetchMethod === "EMBED" && item.embedHtml ? (
-          <div className="w-full [&_iframe]:mx-auto">
-            <EmbedRenderer html={item.embedHtml} platform={item.sourcePlatform} />
-          </div>
-        ) : item.thumbnailUrl ? (
-          <img src={item.thumbnailUrl} alt={item.title ?? ""} className="w-full object-cover" />
+      <div className="bg-gray-50 min-h-[200px] flex items-center justify-center overflow-hidden">
+        {item.thumbnailUrl ? (
+          <img
+            src={item.thumbnailUrl}
+            alt={item.title ?? ""}
+            className="w-full object-cover"
+            loading="lazy"
+          />
         ) : (
           <div className="text-center text-gray-400 text-sm px-4 py-10">
-            Couldn't load a preview for this {PLATFORM_LABEL[item.sourcePlatform]} link.
+            No preview available.
             <br />
-            Use "view on {PLATFORM_LABEL[item.sourcePlatform]}" below.
+            Use &ldquo;View on {PLATFORM_LABEL[item.sourcePlatform]}&rdquo; below to watch.
           </div>
         )}
       </div>
