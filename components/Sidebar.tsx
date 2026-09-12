@@ -11,12 +11,55 @@ interface BoardSummary {
   itemCount: number;
 }
 
+function ChevronLeft() {
+  return (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+    </svg>
+  );
+}
+
+function ChevronRight() {
+  return (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+    </svg>
+  );
+}
+
+function MenuIcon() {
+  return (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  );
+}
+
 export default function Sidebar() {
   const [boards, setBoards] = useState<BoardSummary[]>([]);
   const [newBoardName, setNewBoardName] = useState("");
   const [creating, setCreating] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Persist desktop collapsed state
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("sidebar-collapsed");
+      if (stored === "true") setDesktopCollapsed(true);
+    } catch {}
+  }, []);
+
+  function toggleDesktop() {
+    setDesktopCollapsed((prev) => {
+      try {
+        localStorage.setItem("sidebar-collapsed", String(!prev));
+      } catch {}
+      return !prev;
+    });
+  }
 
   async function loadBoards() {
     const res = await fetch("/api/boards");
@@ -25,6 +68,10 @@ export default function Sidebar() {
 
   useEffect(() => {
     loadBoards();
+  }, [pathname]);
+
+  useEffect(() => {
+    setMobileOpen(false);
   }, [pathname]);
 
   async function createBoard(e: React.FormEvent) {
@@ -49,13 +96,28 @@ export default function Sidebar() {
     }
   }
 
-  return (
-    <aside className="w-64 shrink-0 border-r border-gray-200 bg-white h-screen sticky top-0 flex flex-col">
-      <div className="px-5 py-5 border-b border-gray-100">
+  const navContent = (
+    <>
+      <div className="px-5 py-5 border-b border-gray-100 flex items-center justify-between">
         <Link href="/" className="text-xl font-bold text-navy">
           SONO
         </Link>
-        <p className="text-xs text-gray-500 mt-0.5">Inspiration, captured.</p>
+        {/* Desktop collapse button */}
+        <button
+          onClick={toggleDesktop}
+          className="hidden lg:flex items-center justify-center text-gray-400 hover:text-gray-600 p-1 rounded"
+          aria-label="Collapse sidebar"
+        >
+          <ChevronLeft />
+        </button>
+        {/* Mobile close button */}
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="lg:hidden text-gray-400 hover:text-gray-600 p-1 rounded"
+          aria-label="Close menu"
+        >
+          ✕
+        </button>
       </div>
 
       <nav className="px-3 py-3 border-b border-gray-100">
@@ -83,7 +145,9 @@ export default function Sidebar() {
                   }`}
                 >
                   <span className="truncate">{b.name}</span>
-                  <span className={`text-xs ${active ? "text-gray-300" : "text-gray-400"}`}>{b.itemCount}</span>
+                  <span className={`text-xs ml-2 shrink-0 ${active ? "text-gray-300" : "text-gray-400"}`}>
+                    {b.itemCount}
+                  </span>
                 </Link>
               </li>
             );
@@ -106,6 +170,50 @@ export default function Sidebar() {
           Add
         </button>
       </form>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* ── Desktop sidebar ── */}
+      {!desktopCollapsed && (
+        <aside className="hidden lg:flex w-64 shrink-0 border-r border-gray-200 bg-white h-screen sticky top-0 flex-col">
+          {navContent}
+        </aside>
+      )}
+
+      {/* Desktop collapsed: expand button */}
+      {desktopCollapsed && (
+        <button
+          onClick={toggleDesktop}
+          className="hidden lg:flex fixed top-4 left-0 z-30 items-center justify-center bg-white border border-gray-200 border-l-0 rounded-r-md px-1.5 py-3 shadow-sm text-gray-500 hover:text-gray-700"
+          aria-label="Expand sidebar"
+        >
+          <ChevronRight />
+        </button>
+      )}
+
+      {/* ── Mobile: hamburger button ── */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="lg:hidden fixed top-3 left-3 z-40 bg-white border border-gray-200 rounded-md p-2 shadow-sm text-gray-600"
+        aria-label="Open menu"
+      >
+        <MenuIcon />
+      </button>
+
+      {/* Mobile: drawer + backdrop */}
+      {mobileOpen && (
+        <>
+          <div
+            className="lg:hidden fixed inset-0 z-40 bg-black/40"
+            onClick={() => setMobileOpen(false)}
+          />
+          <aside className="lg:hidden fixed inset-y-0 left-0 z-50 w-72 bg-white flex flex-col shadow-xl">
+            {navContent}
+          </aside>
+        </>
+      )}
+    </>
   );
 }

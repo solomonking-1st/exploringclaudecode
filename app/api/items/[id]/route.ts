@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 const MAX_TAGS = 20;
 const MAX_TAG_LENGTH = 40;
 const MAX_NOTE_LENGTH = 5000;

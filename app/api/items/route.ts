@@ -4,6 +4,8 @@ import { ensureDefaultBoard } from "@/lib/boards";
 import { runSavePipeline, UnsupportedSourceUrlError } from "@/lib/save-pipeline";
 import type { Prisma } from "@prisma/client";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const boardId = searchParams.get("boardId") || undefined;

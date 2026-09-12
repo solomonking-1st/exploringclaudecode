@@ -48,14 +48,14 @@ export default function DashboardPage() {
 
   if (!summary) {
     return (
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-6 py-8 pt-14 lg:pt-8">
         <p className="text-gray-400 text-sm">Loading…</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8">
+    <div className="max-w-6xl mx-auto px-6 py-8 pt-14 lg:pt-8">
       <h1 className="text-2xl font-bold text-navy mb-6">Dashboard</h1>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
