@@ -120,7 +120,7 @@ export default function Sidebar() {
         </button>
       </div>
 
-      <nav className="px-3 py-3 border-b border-gray-100">
+      <nav className="px-3 py-3 border-b border-gray-100 flex flex-col gap-1">
         <Link
           href="/dashboard"
           className={`block rounded-md px-3 py-2 text-sm font-medium ${
@@ -128,6 +128,22 @@ export default function Sidebar() {
           }`}
         >
           Dashboard
+        </Link>
+        <Link
+          href="/tested"
+          className={`block rounded-md px-3 py-2 text-sm font-medium ${
+            pathname === "/tested" ? "bg-navy text-white" : "text-slate hover:bg-gray-100"
+          }`}
+        >
+          Tested
+        </Link>
+        <Link
+          href="/untested"
+          className={`block rounded-md px-3 py-2 text-sm font-medium ${
+            pathname === "/untested" ? "bg-navy text-white" : "text-slate hover:bg-gray-100"
+          }`}
+        >
+          Untested
         </Link>
       </nav>
 

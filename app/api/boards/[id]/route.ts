@@ -29,14 +29,6 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
     return NextResponse.json({ error: "Board not found." }, { status: 404 });
   }
 
-  const totalBoards = await prisma.board.count();
-  if (totalBoards <= 1) {
-    return NextResponse.json(
-      { error: "You can't delete your only board — there always has to be somewhere to save." },
-      { status: 400 }
-    );
-  }
-
   await prisma.board.delete({ where: { id: params.id } });
   return NextResponse.json({ ok: true });
 }

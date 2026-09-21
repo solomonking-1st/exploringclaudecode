@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ensureDefaultBoard } from "@/lib/boards";
 import { runSavePipeline, UnsupportedSourceUrlError } from "@/lib/save-pipeline";
 import type { Prisma } from "@prisma/client";
 
@@ -37,15 +36,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "sourceUrl is required." }, { status: 400 });
   }
 
-  let boardId: string = typeof body?.boardId === "string" ? body.boardId : "";
+  const boardId: string = typeof body?.boardId === "string" ? body.boardId : "";
   if (!boardId) {
-    const defaultBoard = await ensureDefaultBoard();
-    boardId = defaultBoard.id;
-  } else {
-    const board = await prisma.board.findUnique({ where: { id: boardId } });
-    if (!board) {
-      return NextResponse.json({ error: "That board doesn't exist." }, { status: 400 });
-    }
+    return NextResponse.json({ error: "boardId is required." }, { status: 400 });
+  }
+  const board = await prisma.board.findUnique({ where: { id: boardId } });
+  if (!board) {
+    return NextResponse.json({ error: "That board doesn't exist." }, { status: 400 });
   }
 
   let result;

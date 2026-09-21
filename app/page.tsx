@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
-import { ensureDefaultBoard } from "@/lib/boards";
+import { getFirstBoard } from "@/lib/boards";
 
 export default async function Home() {
-  const board = await ensureDefaultBoard();
-  redirect(`/boards/${board.id}`);
+  const board = await getFirstBoard();
+  if (board) {
+    redirect(`/boards/${board.id}`);
+  }
+  redirect("/dashboard");
 }
