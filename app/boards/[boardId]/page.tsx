@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import AddItemForm from "@/components/AddItemForm";
 import ItemCard, { Item } from "@/components/ItemCard";
 
@@ -11,6 +12,7 @@ interface BoardOption {
 
 export default function BoardPage({ params }: { params: { boardId: string } }) {
   const { boardId } = params;
+  const router = useRouter();
   const [items, setItems] = useState<Item[]>([]);
   const [boards, setBoards] = useState<BoardOption[]>([]);
   const [boardName, setBoardName] = useState("");
@@ -60,9 +62,20 @@ export default function BoardPage({ params }: { params: { boardId: string } }) {
     await fetch(`/api/items/${id}`, { method: "DELETE" });
   }
 
+  async function handleDeleteBoard() {
+    if (!confirm(`Delete the board "${boardName}"? All saved items in it will also be deleted.`)) return;
+    await fetch(`/api/boards/${boardId}`, { method: "DELETE" });
+    router.push("/dashboard");
+  }
+
   return (
     <div className="max-w-6xl mx-auto px-6 py-8 pt-14 lg:pt-8">
-      <h1 className="text-2xl font-bold text-navy mb-1">{boardName || "Board"}</h1>
+      <div className="flex items-center justify-between mb-1">
+        <h1 className="text-2xl font-bold text-navy">{boardName || "Board"}</h1>
+        <button onClick={handleDeleteBoard} className="text-xs text-red-500 hover:text-red-700">
+          Delete board
+        </button>
+      </div>
       <p className="text-sm text-gray-500 mb-6">Paste a link to save inspiration into this board.</p>
 
       <div className="mb-6">
