@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ensureDefaultBoard } from "@/lib/boards";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  await ensureDefaultBoard();
-
   const boards = await prisma.board.findMany({
     orderBy: [{ isDefault: "desc" }, { createdAt: "asc" }],
     include: { _count: { select: { items: true } } },
