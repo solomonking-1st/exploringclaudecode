@@ -120,7 +120,7 @@ export default function Sidebar() {
         </button>
       </div>
 
-      <nav className="px-3 py-3 border-b border-gray-100">
+      <nav className="px-3 py-3 border-b border-gray-100 flex flex-col gap-1">
         <Link
           href="/dashboard"
           className={`block rounded-md px-3 py-2 text-sm font-medium ${
@@ -129,10 +129,45 @@ export default function Sidebar() {
         >
           Dashboard
         </Link>
+        <Link
+          href="/tested"
+          className={`block rounded-md px-3 py-2 text-sm font-medium ${
+            pathname === "/tested" ? "bg-navy text-white" : "text-slate hover:bg-gray-100"
+          }`}
+        >
+          Tested
+        </Link>
+        <Link
+          href="/untested"
+          className={`block rounded-md px-3 py-2 text-sm font-medium ${
+            pathname === "/untested" ? "bg-navy text-white" : "text-slate hover:bg-gray-100"
+          }`}
+        >
+          Untested
+        </Link>
       </nav>
 
-      <div className="flex-1 overflow-y-auto px-3 py-3">
-        <p className="px-2 text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">Boards</p>
+      <div className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-2">
+        <div className="flex items-center justify-between px-2 mb-1">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Boards</p>
+        </div>
+
+        <form onSubmit={createBoard} className="flex gap-2">
+          <input
+            value={newBoardName}
+            onChange={(e) => setNewBoardName(e.target.value)}
+            placeholder="New board…"
+            className="flex-1 min-w-0 rounded-md border border-gray-300 px-2 py-1.5 text-sm"
+          />
+          <button
+            type="submit"
+            disabled={creating || !newBoardName.trim()}
+            className="rounded-md bg-navy text-white px-3 py-1.5 text-sm disabled:opacity-40"
+          >
+            Add
+          </button>
+        </form>
+
         <ul className="space-y-1">
           {boards.map((b) => {
             const active = pathname === `/boards/${b.id}`;
@@ -154,22 +189,6 @@ export default function Sidebar() {
           })}
         </ul>
       </div>
-
-      <form onSubmit={createBoard} className="p-3 border-t border-gray-100 flex gap-2">
-        <input
-          value={newBoardName}
-          onChange={(e) => setNewBoardName(e.target.value)}
-          placeholder="New board…"
-          className="flex-1 min-w-0 rounded-md border border-gray-300 px-2 py-1.5 text-sm"
-        />
-        <button
-          type="submit"
-          disabled={creating || !newBoardName.trim()}
-          className="rounded-md bg-navy text-white px-3 py-1.5 text-sm disabled:opacity-40"
-        >
-          Add
-        </button>
-      </form>
     </>
   );
 

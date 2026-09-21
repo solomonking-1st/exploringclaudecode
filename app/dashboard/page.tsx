@@ -28,11 +28,23 @@ interface Summary {
   recentTestedWithPerformance: RecentPerformance[];
 }
 
-function StatTile({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded-lg border border-gray-200 bg-white px-5 py-4">
+function StatTile({ label, value, href }: { label: string; value: number; href?: string }) {
+  const inner = (
+    <>
       <p className="text-2xl font-bold text-navy">{value}</p>
       <p className="text-xs text-gray-500 mt-1">{label}</p>
+    </>
+  );
+  if (href) {
+    return (
+      <Link href={href} className="rounded-lg border border-gray-200 bg-white px-5 py-4 block hover:border-navy transition-colors">
+        {inner}
+      </Link>
+    );
+  }
+  return (
+    <div className="rounded-lg border border-gray-200 bg-white px-5 py-4">
+      {inner}
     </div>
   );
 }
@@ -61,8 +73,8 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         <StatTile label="Boards" value={summary.totals.boards} />
         <StatTile label="Items saved" value={summary.totals.items} />
-        <StatTile label="Tested" value={summary.totals.tested} />
-        <StatTile label="Untested" value={summary.totals.untested} />
+        <StatTile label="Tested" value={summary.totals.tested} href="/tested" />
+        <StatTile label="Untested" value={summary.totals.untested} href="/untested" />
       </div>
 
       <h2 className="text-lg font-semibold text-slate mb-3">By board</h2>

@@ -18,6 +18,7 @@ const HOST_TO_PLATFORM: Record<string, SourcePlatform> = {
   "tiktok.com": "TIKTOK",
   "www.tiktok.com": "TIKTOK",
   "vm.tiktok.com": "TIKTOK",
+  "vt.tiktok.com": "TIKTOK",
   "instagram.com": "INSTAGRAM",
   "www.instagram.com": "INSTAGRAM",
   "facebook.com": "FACEBOOK",
@@ -71,7 +72,7 @@ async function fetchWithTimeout(url: string, timeoutMs = 8000): Promise<Response
 // oEmbed endpoint only accepts full /video/ URLs, so follow the redirect first.
 async function resolveTikTokUrl(sourceUrl: string): Promise<string> {
   const u = new URL(sourceUrl);
-  if (u.hostname !== "vm.tiktok.com") return sourceUrl;
+  if (u.hostname !== "vm.tiktok.com" && u.hostname !== "vt.tiktok.com") return sourceUrl;
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 5000);
